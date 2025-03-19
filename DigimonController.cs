@@ -4,7 +4,7 @@ using System.Linq;
 
 public class DigimonController
 {
-    private List<Digimon> _digimons;
+    private readonly List<Digimon> _digimons;
 
     public DigimonController(string filePath)
     {
@@ -24,84 +24,84 @@ public class DigimonController
             Console.Write("\nVelg et alternativ: ");
 
             string input = Console.ReadLine()?.Trim();
+            HandleUserChoice(input);
+        }
+    }
 
-            switch (input)
-            {
-                case "1":
-                    _digimons.ForEach(Console.WriteLine);
-                    break;
+    private void HandleUserChoice(string input)
+    {
 
-                case "2":
-                    Console.Write("Skriv inn navn: ");
-                    string name = Console.ReadLine()?.Trim();
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        var found = _digimons.Where(d => d.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (found.Any())
-                            found.ForEach(Console.WriteLine);
-                        else
-                            Console.WriteLine("Ingen treff.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ugyldig navn.");
-                    }
-                    break;
+        switch (input)
+        {
+            case "1":
+                PrintAllDigimons();
+                break;
+            case "2":
+                SearchByName();
+                break;
+            case "3":
+                FilterByType();
+                break;
+            case "4":
+                FilterByStage();
+                break;
+            case "5":
+                FindStrongestDigimon();
+                break;
+            case "6":
+                Console.WriteLine("Avslutter...");
+                Environment.Exit(0);
+                break;
+            default:
+                Console.WriteLine("Ugyldig valg. Prøv igjen!");
+                break;
 
-                case "3":
-                    Console.Write("Skriv inn type (Data, Free, Vaccine, Virus): ");
-                    string type = Console.ReadLine()?.Trim();
-                    if (!string.IsNullOrEmpty(type))
-                    {
-                        var byType = _digimons.Where(d => d.Type.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (byType.Any())
-                            byType.ForEach(Console.WriteLine);
-                        else
-                            Console.WriteLine("Ingen Digimon funnet med denne typen.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ugyldig input.");
-                    }
-                    break;
 
-                case "4":
-                    Console.Write("Skriv inn stage (Rookie, Champion, Ultimate, Mega): ");
-                    string stage = Console.ReadLine()?.Trim();
-                    if (!string.IsNullOrEmpty(stage))
-                    {
-                        var byStage = _digimons.Where(d => d.Stage.Equals(stage, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (byStage.Any())
-                            byStage.ForEach(Console.WriteLine);
-                        else
-                            Console.WriteLine("Ingen Digimon funnet med dette stage-nivået.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ugyldig input.");
-                    }
-                    break;
+        }
+    }
 
-                case "5":
-                    if (_digimons.Any())
-                    {
-                        var strongest = _digimons.OrderByDescending(d => d.Attack).First();
-                        Console.WriteLine($"Sterkeste Digimon: {strongest}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ingen data tilgjengelig.");
-                    }
-                    break;
+    private void PrintAllDigimons()
+    {
+        _digimons.ForEach(Console.WriteLine);
+    }
+    private void SearchByName()
+    {
+        Console.WriteLine("Skriv inn navn: ");
+        string name = Console.ReadLine()?.Trim();
+        if (string.IsNullOrEmpty(name)) return;
 
-                case "6":
-                    Console.WriteLine("Avslutter...");
-                    return;
+        var found = _digimons.Where(d => d.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+        Console.WriteLine(found.Any() ? string.Join("\n", found) : "Ingen treff.");
+    }
 
-                default:
-                    Console.WriteLine("Ugyldig valg! Prøv igjen.");
-                    break;
-            }
+    private void FilterByType()
+    {
+        Console.Write("Skriv inn type (Data, Free, Vaccine, Virus): ");
+        string type = Console.ReadLine()?.Trim();
+        var byType = _digimons.Where(d => d.Type.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
+        Console.WriteLine(byType.Any() ? string.Join("\n", byType) : "Ingen Digimon funnet med denne typen.");
+    }
+
+    private void FilterByStage()
+    {
+        Console.Write("Skriv inn stage (Baby, In-Training, Rookie, Champion, Ultimate, Mega): ");
+        string stage = Console.ReadLine()?.Trim();
+        var byStage = _digimons.Where(d => d.Stage.Equals(stage, StringComparison.OrdinalIgnoreCase)).ToList();
+        Console.WriteLine(byStage.Any() ? string.Join("\n", byStage) : "Ingen Digimon funnet med dette stage-nivået.");
+    }
+
+    private void FindStrongestDigimon()
+    {
+        if (_digimons.Any())
+        {
+            var strongest = _digimons.MaxBy(d => d.Attack);
+            Console.WriteLine($"Sterkeste Digimon: {strongest}");
+        }
+        else
+        {
+            Console.WriteLine("Ingen data tilgjengelig.");
         }
     }
 }
+
+

@@ -1,37 +1,49 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
-class CsvReader
+
+public static class CsvReader
 {
     public static List<Digimon> ReadCsv(string filePath)
     {
-        List<Digimon> digimons = new List<Digimon>();
-        string[] lines = File.ReadAllLines(filePath);
+        var digimons = new List<Digimon>();
+        var lines = File.ReadAllLines(filePath).Skip(1);
 
-        for (int i = 1; i < lines.Length; i++) // Starter på linje 1 (hopper over header)
+        foreach (var line in lines)
         {
-            string[] values = lines[i].Split(',');
+            var parts = line.Split(',');
+            if (parts.Length < 13) continue;
 
-            if (values.Length < 11) continue; // Sikrer at vi har nok verdier
+            if (!int.TryParse(parts[0], out int number) ||
+                !int.TryParse(parts[5], out int memory) ||
+                !int.TryParse(parts[6], out int equipSlots) ||
+                !int.TryParse(parts[7], out int lv50HP) ||
+                !int.TryParse(parts[8], out int lv50SP) ||
+                !int.TryParse(parts[9], out int attack) ||
+                !int.TryParse(parts[10], out int defense) ||
+                !int.TryParse(parts[11], out int intelligence) ||
+                !int.TryParse(parts[12], out int speed))
+                continue;
 
-            int number = int.TryParse(values[0], out int num) ? num : 0;
-            string name = values[1];
-            string stage = values[2];
-            string type = values[3];
-            string attribute = values[4];
-            int memory = int.TryParse(values[5], out int mem) ? mem : 0;
-            int equipSlots = int.TryParse(values[6], out int slots) ? slots : 0;
-            int hp = int.TryParse(values[7], out int hpVal) ? hpVal : 0;
-            int sp = int.TryParse(values[8], out int spVal) ? spVal : 0;
-            int attack = int.TryParse(values[9], out int atk) ? atk : 0;
-            int defense = int.TryParse(values[10], out int def) ? def : 0;
-            int intelligence = int.TryParse(values[11], out int intel) ? intel : 0;
-            int speed = int.TryParse(values[12], out int spd) ? spd : 0;
-
-            digimons.Add(new Digimon(number, name, stage, type, attribute, memory, equipSlots, hp, sp, attack, defense, intelligence, speed));
+            digimons.Add(new Digimon
+            {
+                Number = number,
+                Name = parts[1],
+                Stage = parts[2],
+                Type = parts[3],
+                Attribute = parts[4],
+                Memory = memory,
+                EquipSlots = equipSlots,
+                Lv50HP = lv50HP,
+                Lv50SP = lv50SP,
+                Attack = attack,
+                Defense = defense,
+                Intelligence = intelligence,
+                Speed = speed,
+            });
         }
-
         return digimons;
     }
 }
